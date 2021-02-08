@@ -44,7 +44,7 @@ public class MonitorGantt3 extends JPanel implements IDetailPanel {
 
     private GanttParam ganttParamOut;
 
-    private String[][] columnNamesSqls = {{"Activity %", "SQL ID", "SQL type"}};
+    private String[][] columnNamesSqls = {{"Activity %", "SQL ID", "SQL type",  "Sql Text"}};
     private String[][] columnNamesSessions = {{"Activity %", "Session ID", "Session Serial#", "Username", "Program"}};
 
     @Getter @Setter private GanttParam ganttParam;
@@ -122,7 +122,7 @@ public class MonitorGantt3 extends JPanel implements IDetailPanel {
     private GanttTable getGanttDataToViewSqlId() {
         final GanttTable tableGanttSql;
         tableGanttSql = new GanttTable(
-                ganttDataByIdSqlId.getDataToGantt(3),
+                ganttDataByIdSqlId.getDataToGantt(4, getFromRemoteAndStore),
                 columnNamesSqls,
                 getBasicJTableList(),
                 ganttDataByIdSqlId.getListClassAndEvents());
@@ -141,7 +141,7 @@ public class MonitorGantt3 extends JPanel implements IDetailPanel {
     private GanttTable getGanttDataToViewSession() {
         final GanttTable tableGanttSessions;
         tableGanttSessions = new GanttTable(
-                ganttDataByIdSessionId.getDataToGantt(5),
+                ganttDataByIdSessionId.getDataToGantt(5, getFromRemoteAndStore),
                 columnNamesSessions,
                 getBasicJTableList(),
                 ganttDataByIdSessionId.getListClassAndEvents());

@@ -15,4 +15,5 @@ public class ConfigProfile {
 
     private ConnProfile connProfile;
     private List<SqlColProfile> sqlColProfileList;
+    private List<SqlColProfile> sqlSessionsColProfileList;
 }

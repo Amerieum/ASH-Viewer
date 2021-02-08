@@ -5,6 +5,7 @@ import com.egantt.model.drawing.part.ListDrawingPart;
 import com.egantt.model.drawing.state.BasicDrawingState;
 import com.sleepycat.persist.EntityCursor;
 import core.manager.ConstantManager;
+import core.processing.GetFromRemoteAndStore;
 import ext.egantt.drawing.module.BasicPainterModule;
 import ext.egantt.swing.GanttDrawingPartHelper;
 import lombok.Getter;
@@ -36,6 +37,8 @@ public class GanttDataById2 {
 
     private double scale = 0.8;
     private int waitClassId = -1;
+    
+    private GetFromRemoteAndStore getFromRemoteAndStore;
 
     @Getter @Setter private IProfile iProfile;
 
@@ -177,7 +180,9 @@ public class GanttDataById2 {
      * @param columnCnt count of fields
      * @return
      */
-    public Object[][] getDataToGantt(int columnCnt) {
+    public Object[][] getDataToGantt(int columnCnt , GetFromRemoteAndStore getFromRemoteAndStore) {
+    	
+    	this.getFromRemoteAndStore= getFromRemoteAndStore;
 
         Object[][] data = new Object[hashmapCache.size()][columnCnt];
 
@@ -218,6 +223,7 @@ public class GanttDataById2 {
         if (this.parameterGroupId == 0){ // SqlId
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = outputParam[0];
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = addParam[0];
+            data[rowNumber][atomicIntegerInter.getAndIncrement()] = getFromRemoteAndStore.getSqlFullText(outputParam[0]);
 
         } else { // SessionId
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = outputParam[1];
@@ -236,7 +242,12 @@ public class GanttDataById2 {
 
         }
     }
-
+    public String getSqlFullText(String sqlId){
+        if (storeManager.getDatabaseDAO().getParamStringStringDAO().isExistValueByParameter(sqlId)){
+            return storeManager.getDatabaseDAO().getParamStringStringDAO().getValue(sqlId);
+        }
+        return null;
+    }
     private DrawingState createDrawingState(GanttDrawingPartHelper helper,
                                             List<TripleValueCache> me,
                                             double countOfSqls) {

@@ -12,6 +12,7 @@ public interface IProfile {
     String getSqlTextSysdate();
     String getSqlTextAsh();
     String getSqlTextAshOneRow();
+    String getSqlTextSessions();
     String getSqlTextUserIdName();
     String getSqlTextColumn();
 

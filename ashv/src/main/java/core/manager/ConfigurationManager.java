@@ -65,6 +65,20 @@ public class ConfigurationManager {
        }
     }
 
+    public void loadSessionsSqlColumnMetadata(List<SqlColProfile> profilesDb) throws SqlColMetadataException {
+        Optional<List<SqlColProfile>> profileCurr = Optional.ofNullable(getCurrentConfiguration().getSqlSessionsColProfileList());
+
+        if (!profileCurr.isPresent()) {
+            getCurrentConfiguration().setSqlSessionsColProfileList(profilesDb);
+            loadConfigToFile(getCurrentConfiguration());
+        } else {
+            if (profilesDb.size() != profileCurr.get().size()) {
+                throw new SqlColMetadataException("Sessions sql column metadata changes detected.. " +
+                        "Create the new configuration profile!");
+            }
+        }
+     }
+    
     public void loadConfigToFile(ConfigProfile configuration) {
         yamlConfig.saveConfigToFile(configuration);
     }

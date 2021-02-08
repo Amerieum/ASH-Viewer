@@ -52,6 +52,7 @@ public class MonitorDbPanel {
     private JTabbedPane detailGanttAndRaw;
 
     private JPanel controlMainDetailHistory;
+    private JPanel controlMainSesssions;
 
     private MonitorGantt2 monitorGantt20;
     private RawDataTable rawDataTable20;
@@ -104,12 +105,14 @@ public class MonitorDbPanel {
 
         loadDetailChart();
         loadHistory();
+        loadSessions();
     }
 
     public void adddGui(){
         mainTabbedPane.add("Top Activity", topActivitySplitPane);
         mainTabbedPane.add("Detail", detailSplitPane);
         mainTabbedPane.add("History", controlMainDetailHistory);
+        mainTabbedPane.add("Sessions", controlMainSesssions);
     }
 
     public void addGuiHistory(){
@@ -128,6 +131,14 @@ public class MonitorDbPanel {
         this.rawDataTable20.setIProfile(iProfile0);
     }
 
+    public void loadSessions(){
+    	controlMainSesssions = new JPanel();
+    	controlMainSesssions.setLayout(new BorderLayout());
+
+    	//controlMainSesssions.add("Sessions", chartDatasetManager.getMainNameChartDataset().getMonitorGantt2());
+    	controlMainSesssions.revalidate();
+    }
+    
     private void loadDetailChart(){
         Map<String, JRadioButton> mapRadioButton = new LinkedHashMap<>();
 

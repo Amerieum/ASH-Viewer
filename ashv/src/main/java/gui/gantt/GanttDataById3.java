@@ -5,6 +5,7 @@ import com.egantt.model.drawing.part.ListDrawingPart;
 import com.egantt.model.drawing.state.BasicDrawingState;
 import com.sleepycat.persist.EntityCursor;
 import core.manager.ConstantManager;
+import core.processing.GetFromRemoteAndStore;
 import ext.egantt.drawing.module.BasicPainterModule;
 import ext.egantt.swing.GanttDrawingPartHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,8 @@ public class GanttDataById3 {
     int waitClassId = -1;
 
     //private int minNumberOfRows = 100;
+    
+    private  GetFromRemoteAndStore getFromRemoteAndStore;
 
     public GanttDataById3(StoreManager storeManager, byte parameterGroupId){
         this.storeManager = storeManager;
@@ -165,7 +168,9 @@ public class GanttDataById3 {
      * @param columnCnt count of fields
      * @return
      */
-    public Object[][] getDataToGantt(int columnCnt) {
+    public Object[][] getDataToGantt(int columnCnt, GetFromRemoteAndStore getFromRemoteAndStore) {
+    	
+    	this.getFromRemoteAndStore = getFromRemoteAndStore;
 
         Object[][] data = new Object[hashmapCache.size()][columnCnt];
 
@@ -205,6 +210,7 @@ public class GanttDataById3 {
         if (this.parameterGroupId == 0){ // SqlId
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = outputParam[0];
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = addParam[0];
+            data[rowNumber][atomicIntegerInter.getAndIncrement()] = getFromRemoteAndStore.getSqlFullText(outputParam[0]);
 
         } else { // SessionId
             data[rowNumber][atomicIntegerInter.getAndIncrement()] = outputParam[0];

@@ -16,6 +16,7 @@ public class OracleEE implements IProfile {
 
     String sqlTextSysdate = "SELECT sysdate FROM dual";
     String sqlTextAsh = "SELECT * FROM v$active_session_history";
+    String sqlTextSessions = "SELECT * FROM v$session";
     String sqlTextAshOneRow = "SELECT * FROM v$active_session_history WHERE rownum = 1";
     String sqlTextUserIdName = "SELECT user_id, username FROM dba_users";
     String sqlTextColumn = "QUERY";

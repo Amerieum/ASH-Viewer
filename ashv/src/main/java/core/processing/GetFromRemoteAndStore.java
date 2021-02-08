@@ -76,6 +76,7 @@ public class GetFromRemoteAndStore {
 
     private String modNameSysdateSql;
     private String modNameAshSql;
+    private String modNameSessionsSql;
 
     @Getter @Setter private IProfile iProfile;
 
@@ -293,12 +294,15 @@ public class GetFromRemoteAndStore {
         try {
             modNameSysdateSql = "sysdate" + "_" + iProfile.getProfileName();
             modNameAshSql = "ash" + "_" + iProfile.getProfileName();
+            modNameSessionsSql = "sessions" + "_" + iProfile.getProfileName();
 
             metadataMap.put(modNameSysdateSql, loadSqlMetaData(modNameSysdateSql, iProfile.getSqlTextSysdate()));
             metadataMap.put(modNameAshSql, loadSqlMetaData(modNameAshSql, iProfile.getSqlTextAshOneRow()));
+            metadataMap.put(modNameSessionsSql, loadSqlMetaData(modNameSessionsSql, iProfile.getSqlTextSessions()));
 
             // Store metadata in local config file
             configurationManager.loadSqlColumnMetadata(loadSqlMetaData(modNameAshSql, iProfile.getSqlTextAshOneRow()));
+            configurationManager.loadSessionsSqlColumnMetadata(loadSqlMetaData(modNameSessionsSql, iProfile.getSqlTextSessions()));
 
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
