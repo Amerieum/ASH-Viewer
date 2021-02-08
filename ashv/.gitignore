@@ -1,0 +1,20 @@
+# Eclipse Files
+bin
+.project
+.classpath
+.settings
+
+#IntelliJ IDEA Files
+.idea
+*.iml
+target
+out
+
+#Build
+build
+
+#Runtime
+database
+repository
+configuration
+src/main/generated

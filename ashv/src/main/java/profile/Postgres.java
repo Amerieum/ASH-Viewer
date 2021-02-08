@@ -16,6 +16,7 @@ public class Postgres implements IProfile {
     String driverName = "org.postgresql.Driver";
 
     String sqlTextSysdate = "SELECT now()";
+    String sqlTextSessions = "SELECT * FROM pg_stat_activity";
     String sqlTextAsh = "SELECT current_timestamp as SAMPLE_TIME, "
             + "datid, datname, "
             + "pid AS SESSION_ID, pid AS SESSION_SERIAL, usesysid AS USER_ID, "
