@@ -499,6 +499,61 @@ public class GetFromRemoteAndStore {
         }
     }
 
+    public List<Object[][]> loadSessionsData() {
+
+        PreparedStatement s = null;
+        ResultSet rs = null;
+
+
+        List<Object[][]> rows = new ArrayList<>();
+
+        try {
+
+            s = this.getStatementForSessions();
+            rs = s.executeQuery();
+
+            rs.setFetchSize(15000); // to speed up loading
+
+            while (rs.next()) {
+
+                // Prepare collection of rows to store data
+            	Object[][] columns = new Object[ 1][metadataMap.get(modNameSessionsSql).size()];
+
+                for (int i = 0; i < metadataMap.get(modNameSessionsSql).size(); i++) {
+
+                    /** Load raw data **/
+                    columns[0][i] = rs.getObject(i+1);
+
+                }
+
+                rows.add(columns);
+
+            }
+
+            rs.close();
+            s.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getLocalizedMessage());
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return rows;
+    }
     private PreparedStatement getStatementForAsh() throws SQLException{
         PreparedStatement s;
 
@@ -518,6 +573,17 @@ public class GetFromRemoteAndStore {
 
         return s;
     }
+    
+    private PreparedStatement getStatementForSessions() throws SQLException{
+        PreparedStatement s;
+
+        String sqlText = iProfile.getSqlTextSessions();
+
+        s = connection.prepareStatement(sqlText);
+
+        return s;
+    }
+
 
     @NotNull
     private PreparedStatement getPreparedStatement(String sqlText) throws SQLException {

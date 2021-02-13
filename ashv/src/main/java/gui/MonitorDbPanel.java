@@ -11,6 +11,7 @@ import core.processing.GetFromRemoteAndStore;
 import gui.chart.ChartDatasetManager;
 import gui.gantt.MonitorGantt2;
 import gui.table.RawDataTable;
+import gui.table.SessionsDataTable;
 import gui.util.ProgressBarUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +27,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -53,9 +59,10 @@ public class MonitorDbPanel {
 
     private JPanel controlMainDetailHistory;
     private JPanel controlMainSesssions;
-
+    PanelListener listener ;
     private MonitorGantt2 monitorGantt20;
     private RawDataTable rawDataTable20;
+    private SessionsDataTable rawDataTable21;
 
     @Getter @Setter private ConnProfile connProfile;
     @Getter @Setter private IProfile iProfile;
@@ -75,6 +82,7 @@ public class MonitorDbPanel {
         this.getFromRemoteAndStore = getFromRemoteAndStore;
         this.mainTabbedPane = mainTabbedPane;
         this.chartDatasetManager = chartDatasetManager;
+        this.listener = new PanelListener();
     }
 
     public void initialize() {
@@ -113,6 +121,16 @@ public class MonitorDbPanel {
         mainTabbedPane.add("Detail", detailSplitPane);
         mainTabbedPane.add("History", controlMainDetailHistory);
         mainTabbedPane.add("Sessions", controlMainSesssions);
+        mainTabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+            	if (mainTabbedPane.getSelectedIndex() == 3) {
+            		JPanel j = (JPanel) mainTabbedPane.getSelectedComponent();
+            		SessionsDataTable s = (SessionsDataTable) j.getComponent(0);
+                    s.getLoadData().doClick();
+            	}
+                System.out.println("Tab: " + mainTabbedPane.getSelectedIndex());
+            }
+        });
     }
 
     public void addGuiHistory(){
@@ -129,14 +147,26 @@ public class MonitorDbPanel {
         this.monitorGantt20.setIProfile(iProfile0);
         this.historyPanel.setIProfile(iProfile0);
         this.rawDataTable20.setIProfile(iProfile0);
+        this.rawDataTable21.setIProfile(iProfile0);
     }
 
     public void loadSessions(){
+    	
     	controlMainSesssions = new JPanel();
-    	controlMainSesssions.setLayout(new BorderLayout());
+   	
+    	//JTabbedPane detailGanttAndRaw = new JTabbedPane();
+
+        
+    	rawDataTable21 = new SessionsDataTable(jFrame, storeManager, getFromRemoteAndStore);
+        //detailGanttAndRaw.add("Raw data", rawDataTable21);
+
+        rawDataTable21.getLoadData().doClick();
+        controlMainSesssions.add(rawDataTable21,  BorderLayout.CENTER);
+
 
     	//controlMainSesssions.add("Sessions", chartDatasetManager.getMainNameChartDataset().getMonitorGantt2());
     	controlMainSesssions.revalidate();
+    	//controlMainSesssions.addMouseListener(listener);
     }
     
     private void loadDetailChart(){
@@ -424,6 +454,54 @@ public class MonitorDbPanel {
 
             return new GanttParam.Builder(start, end).build();
         }
+    }
+    
+    private class PanelListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent event) {
+                    /* source is the object that got clicked
+                     * 
+                     * If the source is actually a JPanel, 
+                     * then will the object be parsed to JPanel 
+                     * since we need the setBackground() method
+                     */
+            Object source = event.getSource();
+            if(source instanceof JPanel){
+                JPanel panelPressed = (JPanel) source;
+                panelPressed.setBackground(Color.blue);
+                
+                SessionsDataTable s = (SessionsDataTable)panelPressed.getComponent(0);
+                s.getLoadData().doClick();
+                
+            }
+        }
+
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
     }
 
 }

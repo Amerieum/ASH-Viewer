@@ -1,6 +1,8 @@
 package gui.table;
 
 import com.sleepycat.je.DatabaseException;
+
+import core.processing.GetFromRemoteAndStore;
 import gui.BasicFrame;
 import gui.table.searchable.DecoratorFactory;
 import gui.table.searchable.MatchingTextHighlighter;
@@ -43,16 +45,19 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
 
     private JToolBar buttonPanel;
     private JPanel rawDataPanel;
-    private JButton loadData;
+    @Getter @Setter private JButton loadData;
 
     private JXTable table;
     private JXFindBar findBar;
 
     private DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    
+    private GetFromRemoteAndStore getFromRemoteAndStore;
 
-    public SessionsDataTable(BasicFrame jFrame, StoreManager storeManager) {
+    public SessionsDataTable(BasicFrame jFrame, StoreManager storeManager, GetFromRemoteAndStore getFromRemoteAndStore) {
         this.jFrame = jFrame;
         this.storeManager = storeManager;
+        this.getFromRemoteAndStore = getFromRemoteAndStore;
 
         this.setLayout(new GridLayout(1, 1, 3, 3));
 
@@ -72,9 +77,7 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
         loadData.setActionCommand("rdata");
 
         loadData.addActionListener(e -> {
-            long begin =  (long) ganttParamIn.getBeginTime();
-            long end =  (long) ganttParamIn.getEndTime();
-            loadRawData(begin, end);
+            loadRawData();
         });
 
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
@@ -102,7 +105,7 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
         jFrame.repaint();
     }
 
-    private void loadRawData(long begin, long end) {
+    private void loadRawData() {
         rawDataPanel.removeAll();
 
         JPanel panelLoading = createProgressBar("Loading, please wait...");
@@ -124,7 +127,7 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
                     DefaultTableModel tableModel = new DefaultTableModel(getColumnHeaders(), 0);
 
                     /********************************************/
-                    loadDataToTableModel(tableModel, begin, end, iProfile.getWaitClassColName(), waitClassValue);
+                    loadDataToTableModel(tableModel);
                     /********************************************/
 
                     table = new JXTable(tableModel);
@@ -198,14 +201,14 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
 
 
     private String[] getColumnHeaders(){
-        String moduleName = "ash" + "_" + iProfile.getProfileName();
+        String moduleName = "sessions" + "_" + iProfile.getProfileName();
 
         AtomicInteger at = new AtomicInteger(0);
-        String[] out = new String[this.storeManager.getConfigurationManager().getCurrentConfiguration().getSqlColProfileList().size()];
+        String[] out = new String[this.storeManager.getConfigurationManager().getCurrentConfiguration().getSqlSessionsColProfileList().size()];
 
         this.storeManager.getConfigurationManager()
                 .getCurrentConfiguration()
-                .getSqlColProfileList()
+                .getSqlSessionsColProfileList()
                 .stream()
                 .sorted((o1, o2) -> o1.getColId() - o2.getColId())
                 .forEach(e->out[at.getAndIncrement()]= e.getColName());
@@ -213,13 +216,8 @@ public class SessionsDataTable extends JPanel implements IDetailPanel {
         return out;
     }
 
-    private void loadDataToTableModel(DefaultTableModel tableModel, long begin, long end,
-                                      String waitClassColName, String waitClassValue){
-        String moduleName = "ash" + "_" + iProfile.getProfileName();
-
-        this.storeManager.getDatabaseDAO()
-                .getMatrixDataForJTable(begin, end, waitClassColName, waitClassValue,
-                        this.storeManager.getConfigurationManager().getCurrentConfiguration().getSqlColProfileList())
+    private void loadDataToTableModel(DefaultTableModel tableModel){
+        getFromRemoteAndStore.loadSessionsData()
                 .forEach(e -> {
                     for(int row = 0; row < e.length; row++){
                         if (e[row][0] != null) {
